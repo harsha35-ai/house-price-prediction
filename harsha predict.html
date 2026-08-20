@@ -1,0 +1,5124 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Harsha House Prediction | AI Property Valuation</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        #02030a;
+
+    color:
+        #ffffff;
+
+    overflow-x:
+        hidden;
+}
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+body::before {
+
+    content: "";
+
+    position: fixed;
+
+    width: 800px;
+    height: 800px;
+
+    top: -350px;
+    left: -300px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(88,28,135,.35),
+            transparent 68%
+        );
+
+    filter:
+        blur(60px);
+
+    z-index:
+        -5;
+
+}
+
+
+body::after {
+
+    content: "";
+
+    position: fixed;
+
+    width: 700px;
+    height: 700px;
+
+    right: -300px;
+    bottom: -250px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(30,64,175,.25),
+            transparent 70%
+        );
+
+    filter:
+        blur(60px);
+
+    z-index:
+        -5;
+
+}
+
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+#stars {
+
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    pointer-events:
+        none;
+
+    z-index:
+        -3;
+
+}
+
+
+.star {
+
+    position:
+        absolute;
+
+    width:
+        2px;
+
+    height:
+        2px;
+
+    background:
+        white;
+
+    border-radius:
+        50%;
+
+    opacity:
+        .5;
+
+    animation:
+        starFloat linear infinite;
+
+}
+
+
+@keyframes starFloat {
+
+    from {
+        transform:
+            translateY(110vh);
+    }
+
+    to {
+        transform:
+            translateY(-20vh);
+    }
+
+}
+
+
+/* =========================================================
+   INTRO SCREEN
+========================================================= */
+
+#intro {
+
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    z-index:
+        9999;
+
+    background:
+
+        radial-gradient(
+            circle at center,
+            rgba(31,41,55,.15),
+            #010208 70%
+        );
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    overflow:
+        hidden;
+
+    transition:
+        opacity 1.2s ease,
+        visibility 1.2s ease;
+
+}
+
+
+#intro.hide {
+
+    opacity:
+        0;
+
+    visibility:
+        hidden;
+
+}
+
+
+.intro-vignette {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    background:
+
+        radial-gradient(
+            ellipse at center,
+            transparent 15%,
+            rgba(0,0,0,.7) 100%
+        );
+
+    pointer-events:
+        none;
+
+}
+
+
+/* =========================================================
+   3D VILLA
+========================================================= */
+
+.villa-stage {
+
+    position:
+        absolute;
+
+    width:
+        520px;
+
+    height:
+        430px;
+
+    left:
+        50%;
+
+    top:
+        45%;
+
+    transform:
+        translate(-50%,-50%);
+
+    perspective:
+        1000px;
+
+}
+
+
+.villa {
+
+    position:
+        absolute;
+
+    width:
+        330px;
+
+    height:
+        230px;
+
+    left:
+        50%;
+
+    top:
+        50%;
+
+    transform:
+        translate(-50%,-50%)
+        rotateX(5deg);
+
+    transform-style:
+        preserve-3d;
+
+    animation:
+        villaRotate 12s linear infinite;
+
+}
+
+
+@keyframes villaRotate {
+
+    from {
+
+        transform:
+            translate(-50%,-50%)
+            rotateY(0deg)
+            rotateX(5deg);
+
+    }
+
+    to {
+
+        transform:
+            translate(-50%,-50%)
+            rotateY(360deg)
+            rotateX(5deg);
+
+    }
+
+}
+
+
+/* House body */
+
+.house-body {
+
+    position:
+        absolute;
+
+    width:
+        280px;
+
+    height:
+        145px;
+
+    left:
+        25px;
+
+    bottom:
+        30px;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            #20212b,
+            #080910
+        );
+
+    border:
+        1px solid
+        rgba(19, 17, 113, 0.241);
+
+    box-shadow:
+        inset 0 0 40px rgba(255,255,255,.03),
+        0 20px 70px rgba(0,0,0,.9);
+
+    transform:
+        translateZ(0);
+
+}
+
+
+/* Roof */
+
+.roof {
+
+    position:
+        absolute;
+
+    width:
+        0;
+
+    height:
+        0;
+
+    left:
+        0;
+
+    top:
+        -115px;
+
+    border-left:
+        165px solid transparent;
+
+    border-right:
+        165px solid transparent;
+
+    border-bottom:
+        115px solid #10111a;
+
+    filter:
+        drop-shadow(
+            0 15px 20px rgba(0,0,0,.7)
+        );
+
+}
+
+
+/* Roof edge */
+
+.roof-edge {
+
+    position:
+        absolute;
+
+    width:
+        350px;
+
+    height:
+        8px;
+
+    left:
+        -10px;
+
+    top:
+        -4px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #252633,
+            #666778,
+            #1b1c26
+        );
+
+}
+
+
+/* Windows */
+
+.window {
+
+    position:
+        absolute;
+
+    width:
+        48px;
+
+    height:
+        65px;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            rgba(56,189,248,.8),
+            rgba(30,64,175,.35)
+        );
+
+    border:
+        2px solid
+        rgba(255,255,255,.2);
+
+    box-shadow:
+        0 0 25px
+        rgba(56,189,248,.15);
+
+}
+
+
+.window.one {
+
+    left:
+        40px;
+
+    top:
+        35px;
+
+}
+
+
+.window.two {
+
+    left:
+        115px;
+
+    top:
+        35px;
+
+}
+
+
+.window.three {
+
+    left:
+        190px;
+
+    top:
+        35px;
+
+}
+
+
+/* Door */
+
+.door {
+
+    position:
+        absolute;
+
+    width:
+        52px;
+
+    height:
+        90px;
+
+    bottom:
+        0;
+
+    left:
+        114px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #090a10,
+            #292b38
+        );
+
+    border:
+        2px solid
+        #464858;
+
+    box-shadow:
+        inset 0 0 20px
+        rgba(255,255,255,.05);
+
+}
+
+
+/* Door light */
+
+.door::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        6px;
+
+    height:
+        6px;
+
+    border-radius:
+        50%;
+
+    background:
+        #fbbf24;
+
+    right:
+        7px;
+
+    top:
+        48px;
+
+    box-shadow:
+        0 0 10px #fbbf24;
+
+}
+
+
+/* Balcony */
+
+.balcony {
+
+    position:
+        absolute;
+
+    width:
+        115px;
+
+    height:
+        8px;
+
+    right:
+        -25px;
+
+    top:
+        50px;
+
+    background:
+        #333543;
+
+    border:
+        1px solid #55586b;
+
+}
+
+
+/* Balcony rails */
+
+.balcony::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        100%;
+
+    height:
+        30px;
+
+    bottom:
+        7px;
+
+    border:
+        2px solid
+        #55586b;
+
+    border-bottom:
+        none;
+
+}
+
+
+/* Ground */
+
+.ground {
+
+    position:
+        absolute;
+
+    width:
+        600px;
+
+    height:
+        180px;
+
+    left:
+        50%;
+
+    bottom:
+        -50px;
+
+    transform:
+        translateX(-50%)
+        rotateX(70deg);
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(37,99,235,.13),
+            transparent 65%
+        );
+
+    filter:
+        blur(8px);
+
+}
+
+
+/* =========================================================
+   INTRO TEXT
+========================================================= */
+
+.intro-content {
+
+    position:
+        relative;
+
+    z-index:
+        10;
+
+    width:
+        100%;
+
+    text-align:
+        center;
+
+    margin-top:
+        350px;
+
+}
+
+
+.intro-mini {
+
+    letter-spacing:
+        7px;
+
+    font-size:
+        12px;
+
+    color:
+        #94a3b8;
+
+    text-transform:
+        uppercase;
+
+    margin-bottom:
+        12px;
+
+}
+
+
+.intro-title {
+
+    font-size:
+        clamp(42px,7vw,82px);
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        -3px;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            #ffffff,
+            #a78bfa,
+            #60a5fa,
+            #ffffff
+        );
+
+    background-size:
+        300%;
+
+    -webkit-background-clip:
+        text;
+
+    color:
+        transparent;
+
+    animation:
+        titleGlow 5s infinite;
+
+}
+
+
+@keyframes titleGlow {
+
+    0% {
+        background-position: 0%;
+    }
+
+    50% {
+        background-position: 100%;
+    }
+
+    100% {
+        background-position: 0%;
+    }
+
+}
+
+
+.intro-sub {
+
+    margin-top:
+        12px;
+
+    color:
+        #cbd5e1;
+
+    font-size:
+        17px;
+
+}
+
+
+.enter-btn {
+
+    margin-top:
+        28px;
+
+    padding:
+        16px 42px;
+
+    border:
+        1px solid
+        rgba(167,139,250,.4);
+
+    border-radius:
+        50px;
+
+    color:
+        white;
+
+    font-weight:
+        800;
+
+    cursor:
+        pointer;
+
+    background:
+
+        linear-gradient(
+            100deg,
+            rgba(124,58,237,.8),
+            rgba(37,99,235,.8)
+        );
+
+    box-shadow:
+        0 0 45px
+        rgba(99,102,241,.35);
+
+    transition:
+        .3s;
+
+}
+
+
+.enter-btn:hover {
+
+    transform:
+        scale(1.06)
+        translateY(-3px);
+
+    box-shadow:
+        0 0 70px
+        rgba(99,102,241,.55);
+
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+#app {
+
+    display:
+        none;
+
+}
+
+
+#app.visible {
+
+    display:
+        block;
+
+    animation:
+        applicationIn 1s ease;
+
+}
+
+
+@keyframes applicationIn {
+
+    from {
+
+        opacity:
+            0;
+
+        transform:
+            translateY(25px);
+
+    }
+
+    to {
+
+        opacity:
+            1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar {
+
+    position:
+        sticky;
+
+    top:
+        0;
+
+    z-index:
+        1000;
+
+    height:
+        74px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    padding:
+        0 5%;
+
+    background:
+        rgba(2,3,10,.78);
+
+    backdrop-filter:
+        blur(22px);
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.08);
+
+}
+
+
+.logo {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        10px;
+
+    font-weight:
+        900;
+
+    font-size:
+        19px;
+
+}
+
+
+.logo-box {
+
+    width:
+        40px;
+
+    height:
+        40px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #2563eb
+        );
+
+    box-shadow:
+        0 0 25px
+        rgba(124,58,237,.35);
+
+}
+
+
+.logo-name {
+
+    color:
+        #ffffff;
+
+}
+
+
+.logo-name span {
+
+    color:
+        #a78bfa;
+
+}
+
+
+.nav-links {
+
+    display:
+        flex;
+
+    gap:
+        28px;
+
+}
+
+
+.nav-links a {
+
+    text-decoration:
+        none;
+
+    color:
+        #94a3b8;
+
+    font-size:
+        14px;
+
+    transition:
+        .3s;
+
+}
+
+
+.nav-links a:hover {
+
+    color:
+        white;
+
+}
+
+
+.live-status {
+
+    padding:
+        9px 14px;
+
+    border-radius:
+        30px;
+
+    color:
+        #34d399;
+
+    font-size:
+        12px;
+
+    background:
+        rgba(16,185,129,.08);
+
+    border:
+        1px solid
+        rgba(16,185,129,.2);
+
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+
+    min-height:
+        540px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    padding:
+        70px 7%;
+
+    background:
+
+        radial-gradient(
+            circle at 80% 50%,
+            rgba(79,70,229,.12),
+            transparent 35%
+        );
+
+}
+
+
+.hero-content {
+
+    max-width:
+        850px;
+
+}
+
+
+.hero-tag {
+
+    display:
+        inline-block;
+
+    padding:
+        8px 15px;
+
+    border-radius:
+        30px;
+
+    background:
+        rgba(124,58,237,.1);
+
+    border:
+        1px solid
+        rgba(167,139,250,.2);
+
+    color:
+        #c4b5fd;
+
+    font-size:
+        13px;
+
+}
+
+
+.hero h1 {
+
+    margin-top:
+        22px;
+
+    font-size:
+        clamp(43px,6vw,78px);
+
+    line-height:
+        1.02;
+
+    letter-spacing:
+        -3px;
+
+}
+
+
+.hero h1 span {
+
+    background:
+        linear-gradient(
+            90deg,
+            #c084fc,
+            #60a5fa
+        );
+
+    -webkit-background-clip:
+        text;
+
+    color:
+        transparent;
+
+}
+
+
+.hero p {
+
+    margin-top:
+        25px;
+
+    max-width:
+        700px;
+
+    color:
+        #94a3b8;
+
+    font-size:
+        18px;
+
+    line-height:
+        1.8;
+
+}
+
+
+.hero-buttons {
+
+    display:
+        flex;
+
+    gap:
+        14px;
+
+    margin-top:
+        32px;
+
+}
+
+
+.btn {
+
+    border:
+        none;
+
+    padding:
+        14px 22px;
+
+    border-radius:
+        10px;
+
+    font-weight:
+        800;
+
+    cursor:
+        pointer;
+
+    transition:
+        .3s;
+
+}
+
+
+.btn:hover {
+
+    transform:
+        translateY(-3px);
+
+}
+
+
+.primary {
+
+    color:
+        white;
+
+    background:
+        linear-gradient(
+            90deg,
+            #7c3aed,
+            #2563eb
+        );
+
+    box-shadow:
+        0 10px 30px
+        rgba(79,70,229,.25);
+
+}
+
+
+.secondary {
+
+    color:
+        white;
+
+    background:
+        rgba(255,255,255,.05);
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+}
+
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.container {
+
+    max-width:
+        1450px;
+
+    margin:
+        auto;
+
+    padding:
+        30px 5%;
+
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:
+        16px;
+
+}
+
+
+.card {
+
+    background:
+        rgba(12,15,28,.72);
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    border-radius:
+        18px;
+
+    padding:
+        23px;
+
+    backdrop-filter:
+        blur(18px);
+
+    transition:
+        .3s;
+
+}
+
+
+.card:hover {
+
+    transform:
+        translateY(-5px);
+
+    border-color:
+        rgba(139,92,246,.35);
+
+}
+
+
+.stat-icon {
+
+    font-size:
+        25px;
+
+}
+
+
+.stat-label {
+
+    margin-top:
+        10px;
+
+    color:
+        #64748b;
+
+    font-size:
+        12px;
+
+}
+
+
+.stat-value {
+
+    margin-top:
+        7px;
+
+    font-size:
+        27px;
+
+    font-weight:
+        900;
+
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.section {
+
+    margin-top:
+        22px;
+
+}
+
+
+.two-column {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        1.25fr .75fr;
+
+    gap:
+        20px;
+
+}
+
+
+.section-title {
+
+    font-size:
+        20px;
+
+    font-weight:
+        800;
+
+}
+
+
+.section-subtitle {
+
+    margin-top:
+        7px;
+
+    margin-bottom:
+        20px;
+
+    color:
+        #64748b;
+
+    font-size:
+        13px;
+
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:
+        14px;
+
+}
+
+
+label {
+
+    display:
+        block;
+
+    margin-bottom:
+        7px;
+
+    color:
+        #94a3b8;
+
+    font-size:
+        12px;
+
+}
+
+
+input,
+select {
+
+    width:
+        100%;
+
+    padding:
+        13px;
+
+    color:
+        white;
+
+    background:
+        #070a14;
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+    border-radius:
+        9px;
+
+    outline:
+        none;
+
+}
+
+
+input:focus,
+select:focus {
+
+    border-color:
+        #8b5cf6;
+
+    box-shadow:
+        0 0 20px
+        rgba(139,92,246,.12);
+
+}
+
+
+option {
+
+    background:
+        #0b0e18;
+
+}
+
+
+.form-actions {
+
+    margin-top:
+        20px;
+
+    display:
+        flex;
+
+    gap:
+        10px;
+
+    flex-wrap:
+        wrap;
+
+}
+
+
+/* =========================================================
+   PREDICTION
+========================================================= */
+
+.prediction {
+
+    min-height:
+        100%;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+    text-align:
+        center;
+
+    background:
+
+        radial-gradient(
+            circle at center,
+            rgba(124,58,237,.18),
+            transparent 65%
+        ),
+
+        rgba(12,15,28,.75);
+
+}
+
+
+.prediction-label {
+
+    color:
+        #94a3b8;
+
+}
+
+
+.prediction-price {
+
+    margin-top:
+        12px;
+
+    font-size:
+        clamp(35px,5vw,58px);
+
+    font-weight:
+        900;
+
+    background:
+        linear-gradient(
+            90deg,
+            #e9d5ff,
+            #93c5fd
+        );
+
+    -webkit-background-clip:
+        text;
+
+    color:
+        transparent;
+
+}
+
+
+.prediction-range {
+
+    color:
+        #64748b;
+
+    margin-top:
+        10px;
+
+}
+
+
+.confidence {
+
+    width:
+        100%;
+
+    margin-top:
+        25px;
+
+}
+
+
+.confidence-bar {
+
+    height:
+        7px;
+
+    margin-top:
+        7px;
+
+    border-radius:
+        20px;
+
+    background:
+        rgba(255,255,255,.07);
+
+    overflow:
+        hidden;
+
+}
+
+
+.confidence-fill {
+
+    width:
+        88%;
+
+    height:
+        100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #7c3aed,
+            #38bdf8
+        );
+
+}
+
+
+/* =========================================================
+   INDIA LOCATION
+========================================================= */
+
+.india-box {
+
+    padding:
+        20px;
+
+    border-radius:
+        15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(124,58,237,.1),
+            rgba(37,99,235,.05)
+        );
+
+    border:
+        1px solid
+        rgba(139,92,246,.15);
+
+}
+
+
+.india-title {
+
+    font-weight:
+        800;
+
+    margin-bottom:
+        8px;
+
+}
+
+
+.india-description {
+
+    color:
+        #94a3b8;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.6;
+
+}
+
+
+/* =========================================================
+   MARKET
+========================================================= */
+
+.market-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:
+        15px;
+
+}
+
+
+.market-box {
+
+    padding:
+        20px;
+
+    border-radius:
+        14px;
+
+    background:
+        rgba(2,6,23,.5);
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+
+}
+
+
+.market-box span {
+
+    color:
+        #64748b;
+
+    font-size:
+        12px;
+
+}
+
+
+.market-box strong {
+
+    display:
+        block;
+
+    margin-top:
+        8px;
+
+    font-size:
+        23px;
+
+}
+
+
+/* =========================================================
+   MODEL INFO
+========================================================= */
+
+.model-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:
+        12px;
+
+}
+
+
+.info {
+
+    padding:
+        16px;
+
+    border-radius:
+        12px;
+
+    background:
+        rgba(2,6,23,.55);
+
+}
+
+
+.info small {
+
+    color:
+        #64748b;
+
+}
+
+
+.info strong {
+
+    display:
+        block;
+
+    margin-top:
+        5px;
+
+}
+
+
+.ready {
+
+    color:
+        #34d399;
+
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-wrapper {
+
+    overflow-x:
+        auto;
+
+}
+
+
+table {
+
+    width:
+        100%;
+
+    border-collapse:
+        collapse;
+
+}
+
+
+th,
+td {
+
+    padding:
+        14px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.06);
+
+    text-align:
+        left;
+
+    font-size:
+        13px;
+
+}
+
+
+th {
+
+    color:
+        #64748b;
+
+}
+
+
+td {
+
+    color:
+        #cbd5e1;
+
+}
+
+
+/* =========================================================
+   CTA
+========================================================= */
+
+.cta {
+
+    margin-top:
+        25px;
+
+    padding:
+        45px;
+
+    border-radius:
+        22px;
+
+    background:
+
+        radial-gradient(
+            circle at 90% 50%,
+            rgba(59,130,246,.2),
+            transparent 35%
+        ),
+
+        linear-gradient(
+            120deg,
+            rgba(124,58,237,.25),
+            rgba(37,99,235,.15)
+        );
+
+    border:
+        1px solid
+        rgba(167,139,250,.18);
+
+}
+
+
+.cta h2 {
+
+    font-size:
+        31px;
+
+}
+
+
+.cta p {
+
+    color:
+        #94a3b8;
+
+    margin-top:
+        10px;
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+
+    text-align:
+        center;
+
+    padding:
+        55px 20px;
+
+    color:
+        #475569;
+
+}
+
+
+.footer-brand {
+
+    color:
+        white;
+
+    font-size:
+        20px;
+
+    font-weight:
+        900;
+
+    margin-bottom:
+        8px;
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+#toast {
+
+    position:
+        fixed;
+
+    right:
+        20px;
+
+    bottom:
+        20px;
+
+    padding:
+        14px 18px;
+
+    border-radius:
+        10px;
+
+    background:
+        rgba(15,23,42,.95);
+
+    border:
+        1px solid
+        rgba(139,92,246,.4);
+
+    opacity:
+        0;
+
+    transform:
+        translateY(80px);
+
+    transition:
+        .35s;
+
+    z-index:
+        99999;
+
+}
+
+
+#toast.show {
+
+    opacity:
+        1;
+
+    transform:
+        translateY(0);
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1050px) {
+
+    .stats {
+
+        grid-template-columns:
+            repeat(2,1fr);
+
+    }
+
+    .two-column {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+}
+
+
+@media(max-width:750px) {
+
+    .nav-links {
+
+        display:
+            none;
+
+    }
+
+    .stats {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .form-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .market-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .hero {
+
+        padding:
+            50px 25px;
+
+    }
+
+    .hero h1 {
+
+        letter-spacing:
+            -2px;
+
+    }
+
+    .villa-stage {
+
+        transform:
+            translate(-50%,-50%)
+            scale(.65);
+
+    }
+
+    .intro-content {
+
+        margin-top:
+            270px;
+
+    }
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading {
+
+    display:
+        inline-block;
+
+    width:
+        15px;
+
+    height:
+        15px;
+
+    border:
+        2px solid
+        rgba(255,255,255,.2);
+
+    border-top-color:
+        white;
+
+    border-radius:
+        50%;
+
+    animation:
+        spin .8s linear infinite;
+
+}
+
+
+@keyframes spin {
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="stars"></div>
+
+
+<!-- =====================================================
+     CINEMATIC OPENING
+===================================================== -->
+
+<section id="intro">
+
+    <div class="villa-stage">
+
+        <div class="ground"></div>
+
+        <div class="villa">
+
+            <div class="house-body">
+
+                <div class="roof">
+
+                    <div class="roof-edge"></div>
+
+                </div>
+
+                <div class="window one"></div>
+
+                <div class="window two"></div>
+
+                <div class="window three"></div>
+
+                <div class="door"></div>
+
+                <div class="balcony"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="intro-vignette"></div>
+
+
+    <div class="intro-content">
+
+        <div class="intro-mini">
+
+            NEXT GENERATION PROPERTY INTELLIGENCE
+
+        </div>
+
+        <h1 class="intro-title">
+
+            Harsha House Prediction
+
+        </h1>
+
+        <div class="intro-sub">
+
+            AI-Powered Indian House Price Prediction
+
+        </div>
+
+        <button
+            class="enter-btn"
+            onclick="enterWebsite()">
+
+            🏡 ENTER PLATFORM
+
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     APPLICATION
+===================================================== -->
+
+<div id="app">
+
+
+<nav class="navbar">
+
+    <div class="logo">
+
+        <div class="logo-box">
+            🏠
+        </div>
+
+        <div class="logo-name">
+
+            Harsha House
+            <span>Prediction</span>
+
+        </div>
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="#dashboard">
+            Dashboard
+        </a>
+
+        <a href="#predict">
+            Predict
+        </a>
+
+        <a href="#india">
+            India
+        </a>
+
+        <a href="#database">
+            Database
+        </a>
+
+    </div>
+
+
+    <div class="live-status">
+
+        ● AI SYSTEM ONLINE
+
+    </div>
+
+</nav>
+
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-tag">
+
+            🇮🇳 INDIA-WIDE PROPERTY INTELLIGENCE
+
+        </div>
+
+
+        <h1>
+
+            Predict the
+            <span>True Value</span>
+            of Any Home.
+
+        </h1>
+
+
+        <p>
+
+            Harsha House Prediction uses property
+            features, location, area and market
+            information to estimate residential
+            property values across India.
+
+        </p>
+
+
+        <div class="hero-buttons">
+
+            <button
+                class="btn primary"
+                onclick="goPredict()">
+
+                🔮 Predict Property
+
+            </button>
+
+
+            <button
+                class="btn secondary"
+                onclick="goIndia()">
+
+                🇮🇳 Explore India
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<main
+    class="container"
+    id="dashboard">
+
+
+<!-- =====================================================
+     DASHBOARD CARDS
+===================================================== -->
+
+<section class="stats">
+
+
+<div class="card">
+
+    <div class="stat-icon">
+        🏘️
+    </div>
+
+    <div class="stat-label">
+        Properties Stored
+    </div>
+
+    <div
+        class="stat-value"
+        id="propertyCount">
+
+        0
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="stat-icon">
+        💰
+    </div>
+
+    <div class="stat-label">
+        Average Price
+    </div>
+
+    <div
+        class="stat-value"
+        id="averagePrice">
+
+        ₹0
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="stat-icon">
+        📐
+    </div>
+
+    <div class="stat-label">
+        Average ₹ / Sq.Ft
+    </div>
+
+    <div
+        class="stat-value"
+        id="averagePSF">
+
+        ₹0
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="stat-icon">
+        📈
+    </div>
+
+    <div class="stat-label">
+        India Market Index
+    </div>
+
+    <div
+        class="stat-value"
+        id="marketIndex">
+
+        100
+
+    </div>
+
+</div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     PREDICT
+===================================================== -->
+
+<section
+    class="section"
+    id="predict">
+
+
+<div class="two-column">
+
+
+<div class="card">
+
+    <div class="section-title">
+
+        🔮 Harsha AI Property Predictor
+
+    </div>
+
+    <div class="section-subtitle">
+
+        Enter the property details.
+
+    </div>
+
+
+    <div class="form-grid">
+
+
+        <div>
+
+            <label>
+                Area / Locality
+            </label>
+
+            <input
+                id="areaName"
+                list="indiaLocations"
+                placeholder="Example: Madhapur, Hyderabad">
+
+            <datalist id="indiaLocations"></datalist>
+
+        </div>
+
+
+        <div>
+
+            <label>
+                State / Union Territory
+            </label>
+
+            <select id="state">
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label>
+                City
+            </label>
+
+            <input
+                id="city"
+                placeholder="Example: Hyderabad">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Area (sq.ft)
+            </label>
+
+            <input
+                id="area"
+                type="number"
+                value="1500">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Bedrooms
+            </label>
+
+            <input
+                id="bedrooms"
+                type="number"
+                value="3">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Bathrooms
+            </label>
+
+            <input
+                id="bathrooms"
+                type="number"
+                value="2">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Property Age
+            </label>
+
+            <input
+                id="age"
+                type="number"
+                value="5">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Floor
+            </label>
+
+            <input
+                id="floor"
+                type="number"
+                value="2">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Total Floors
+            </label>
+
+            <input
+                id="totalFloors"
+                type="number"
+                value="5">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Parking
+            </label>
+
+            <select id="parking">
+
+                <option value="0">
+                    No Parking
+                </option>
+
+                <option value="1" selected>
+                    1 Parking
+                </option>
+
+                <option value="2">
+                    2 Parking
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Property Type
+            </label>
+
+            <select id="propertyType">
+
+                <option>
+                    Apartment
+                </option>
+
+                <option>
+                    Independent House
+                </option>
+
+                <option>
+                    Villa
+                </option>
+
+                <option>
+                    Plot
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Furnishing
+            </label>
+
+            <select id="furnished">
+
+                <option>
+                    Unfurnished
+                </option>
+
+                <option selected>
+                    Semi-Furnished
+                </option>
+
+                <option>
+                    Fully Furnished
+                </option>
+
+            </select>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            class="btn primary"
+            onclick="predictPrice()">
+
+            ✨ PREDICT PRICE
+
+        </button>
+
+
+        <button
+            class="btn secondary"
+            onclick="clearPrediction()">
+
+            CLEAR
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- RESULT -->
+
+<div class="card prediction">
+
+    <div class="prediction-label">
+
+        HARsha AI ESTIMATED VALUE
+
+    </div>
+
+
+    <div
+        class="prediction-price"
+        id="prediction">
+
+        ₹0
+
+    </div>
+
+
+    <div
+        class="prediction-range"
+        id="predictionRange">
+
+        Enter property information
+        to generate a prediction.
+
+    </div>
+
+
+    <div class="confidence">
+
+        <div
+            style="
+            color:#94a3b8;
+            font-size:12px">
+
+            Prediction confidence
+
+            <span style="float:right">
+                88%
+            </span>
+
+        </div>
+
+
+        <div class="confidence-bar">
+
+            <div class="confidence-fill"></div>
+
+        </div>
+
+    </div>
+
+
+    <p
+        style="
+        margin-top:25px;
+        color:#475569;
+        font-size:11px">
+
+        AI estimate only. Actual market value
+        can vary by locality, property condition,
+        transaction type and current listings.
+
+    </p>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+
+<!-- =====================================================
+     INDIA
+===================================================== -->
+
+<section
+    class="section"
+    id="india">
+
+
+<div class="card">
+
+    <div class="section-title">
+
+        🇮🇳 India-Wide Location Engine
+
+    </div>
+
+    <div class="section-subtitle">
+
+        Select any state/UT and enter the locality,
+        city, district or neighbourhood.
+
+    </div>
+
+
+    <div class="india-box">
+
+        <div class="india-title">
+
+            📍 Location Coverage
+
+        </div>
+
+        <div class="india-description">
+
+            The system is designed so that locations
+            are not restricted to a small hard-coded
+            city list. You can enter a locality,
+            neighbourhood, district or city anywhere
+            in India.
+
+            <br><br>
+
+            The live price layer is connected through
+            the API configuration below. This is the
+            correct architecture for obtaining
+            continuously updated market information.
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- =====================================================
+     MARKET
+===================================================== -->
+
+<section class="section">
+
+<div class="two-column">
+
+
+<div class="card">
+
+    <div class="section-title">
+
+        📈 India Market Monitor
+
+    </div>
+
+    <div class="section-subtitle">
+
+        Current information used by the application.
+
+    </div>
+
+
+    <div class="market-grid">
+
+
+        <div class="market-box">
+
+            <span>
+                Average Price
+            </span>
+
+            <strong id="marketAverage">
+                ₹0
+            </strong>
+
+        </div>
+
+
+        <div class="market-box">
+
+            <span>
+                Average ₹ / Sq.Ft
+            </span>
+
+            <strong id="marketPSF">
+                ₹0
+            </strong>
+
+        </div>
+
+
+        <div class="market-box">
+
+            <span>
+                Market Change
+            </span>
+
+            <strong id="marketChange">
+                0%
+            </strong>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<div class="card">
+
+    <div class="section-title">
+
+        🤖 AI System
+
+    </div>
+
+
+    <div class="model-grid">
+
+
+        <div class="info">
+
+            <small>
+                MODEL
+            </small>
+
+            <strong>
+                Harsha House Prediction
+            </strong>
+
+        </div>
+
+
+        <div class="info">
+
+            <small>
+                STATUS
+            </small>
+
+            <strong
+                class="ready"
+                id="modelStatus">
+
+                Ready
+
+            </strong>
+
+        </div>
+
+
+        <div class="info">
+
+            <small>
+                LAST UPDATE
+            </small>
+
+            <strong id="lastUpdate">
+                Not available
+            </strong>
+
+        </div>
+
+
+        <div class="info">
+
+            <small>
+                NEXT UPDATE
+            </small>
+
+            <strong id="nextUpdate">
+                Calculating...
+            </strong>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            class="btn primary"
+            onclick="trainModel()">
+
+            🧠 Train AI
+
+        </button>
+
+
+        <button
+            class="btn secondary"
+            onclick="updateMarket()">
+
+            🔄 Update Now
+
+        </button>
+
+    </div>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+
+<!-- =====================================================
+     ADD DATA
+===================================================== -->
+
+<section class="section">
+
+<div class="card">
+
+    <div class="section-title">
+
+        ➕ Add Real Property Data
+
+    </div>
+
+    <div class="section-subtitle">
+
+        No CSV required. Data is stored locally
+        as JSON in the browser.
+
+    </div>
+
+
+    <div class="form-grid">
+
+
+        <div>
+
+            <label>
+                Location
+            </label>
+
+            <input
+                id="newLocation"
+                placeholder="Banjara Hills">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                City
+            </label>
+
+            <input
+                id="newCity"
+                placeholder="Hyderabad">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                State
+            </label>
+
+            <input
+                id="newState"
+                placeholder="Telangana">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Price (₹)
+            </label>
+
+            <input
+                id="newPrice"
+                type="number"
+                placeholder="8500000">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Area (sq.ft)
+            </label>
+
+            <input
+                id="newArea"
+                type="number"
+                placeholder="1500">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Bedrooms
+            </label>
+
+            <input
+                id="newBedrooms"
+                type="number"
+                placeholder="3">
+
+        </div>
+
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            class="btn primary"
+            onclick="addProperty()">
+
+            ➕ ADD PROPERTY
+
+        </button>
+
+
+        <button
+            class="btn secondary"
+            onclick="exportJSON()">
+
+            ⬇ EXPORT JSON
+
+        </button>
+
+
+        <button
+            class="btn secondary"
+            onclick="importJSON()">
+
+            ⬆ IMPORT JSON
+
+        </button>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- =====================================================
+     DATABASE
+===================================================== -->
+
+<section
+    class="section"
+    id="database">
+
+
+<div class="card">
+
+    <div class="section-title">
+
+        🏘️ Property Database
+
+    </div>
+
+    <div class="section-subtitle">
+
+        Stored property records used for training.
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Location
+                    </th>
+
+                    <th>
+                        City
+                    </th>
+
+                    <th>
+                        State
+                    </th>
+
+                    <th>
+                        Area
+                    </th>
+
+                    <th>
+                        Bedrooms
+                    </th>
+
+                    <th>
+                        Price
+                    </th>
+
+                    <th>
+                        ₹/Sq.Ft
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="propertyTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- =====================================================
+     HISTORY
+===================================================== -->
+
+<section class="section">
+
+<div class="card">
+
+    <div class="section-title">
+
+        🔮 Prediction History
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Location
+                    </th>
+
+                    <th>
+                        City
+                    </th>
+
+                    <th>
+                        Area
+                    </th>
+
+                    <th>
+                        Prediction
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="historyTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- =====================================================
+     CTA
+===================================================== -->
+
+<section class="cta">
+
+    <h2>
+
+        Find the value hidden inside every property.
+
+    </h2>
+
+    <p>
+
+        Harsha House Prediction —
+        intelligent property valuation for India.
+
+    </p>
+
+
+    <button
+        class="btn primary"
+        onclick="goPredict()">
+
+        🚀 PREDICT A PROPERTY
+
+    </button>
+
+</section>
+
+
+</main>
+
+
+
+<footer>
+
+    <div class="footer-brand">
+
+        🏠 Harsha House Prediction
+
+    </div>
+
+    <p>
+        AI-powered property valuation platform
+    </p>
+
+    <p style="margin-top:8px">
+        Built for Indian real-estate analysis
+    </p>
+
+</footer>
+
+
+</div>
+
+
+<div id="toast">
+    Message
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   IMPORTANT API CONFIGURATION
+=========================================================
+
+   Put your REAL property-data backend here.
+
+   Example:
+
+   const MARKET_API_URL =
+       "https://your-domain.com/api/market";
+
+   Expected JSON example:
+
+   {
+       "updatedAt":"2026-08-09T08:00:00Z",
+       "marketIndex":102.4,
+       "locations":{
+           "Hyderabad":{
+               "Madhapur":12500,
+               "Gachibowli":14000
+           }
+       }
+   }
+
+   DO NOT put private API keys directly into HTML.
+
+========================================================= */
+
+const MARKET_API_URL = "";
+
+
+/* =========================================================
+   INDIA STATES + UTs
+========================================================= */
+
+const INDIA_STATES = [
+
+"Andhra Pradesh",
+"Arunachal Pradesh",
+"Assam",
+"Bihar",
+"Chhattisgarh",
+"Goa",
+"Gujarat",
+"Haryana",
+"Himachal Pradesh",
+"Jharkhand",
+"Karnataka",
+"Kerala",
+"Madhya Pradesh",
+"Maharashtra",
+"Manipur",
+"Meghalaya",
+"Mizoram",
+"Nagaland",
+"Odisha",
+"Punjab",
+"Rajasthan",
+"Sikkim",
+"Tamil Nadu",
+"Telangana",
+"Tripura",
+"Uttar Pradesh",
+"Uttarakhand",
+"West Bengal",
+
+"Andaman and Nicobar Islands",
+"Chandigarh",
+"Dadra and Nagar Haveli and Daman and Diu",
+"Delhi",
+"Jammu and Kashmir",
+"Ladakh",
+"Lakshadweep",
+"Puducherry"
+
+];
+
+
+/* =========================================================
+   MAJOR LOCATION DIRECTORY
+========================================================= */
+
+const INDIA_LOCATIONS = [
+
+"Ahmedabad, Gujarat",
+"Amritsar, Punjab",
+"Aurangabad, Maharashtra",
+"Bengaluru, Karnataka",
+"Bhopal, Madhya Pradesh",
+"Bhubaneswar, Odisha",
+"Chandigarh, Chandigarh",
+"Chennai, Tamil Nadu",
+"Coimbatore, Tamil Nadu",
+"Dehradun, Uttarakhand",
+"Delhi, Delhi",
+"Faridabad, Haryana",
+"Gandhinagar, Gujarat",
+"Ghaziabad, Uttar Pradesh",
+"Goa",
+"Gurugram, Haryana",
+"Guwahati, Assam",
+"Gwalior, Madhya Pradesh",
+"Hyderabad, Telangana",
+"Indore, Madhya Pradesh",
+"Jaipur, Rajasthan",
+"Jalandhar, Punjab",
+"Jammu, Jammu and Kashmir",
+"Jamshedpur, Jharkhand",
+"Kanpur, Uttar Pradesh",
+"Kochi, Kerala",
+"Kolkata, West Bengal",
+"Kota, Rajasthan",
+"Lucknow, Uttar Pradesh",
+"Ludhiana, Punjab",
+"Madurai, Tamil Nadu",
+"Mangaluru, Karnataka",
+"Meerut, Uttar Pradesh",
+"Mumbai, Maharashtra",
+"Mysuru, Karnataka",
+"Nagpur, Maharashtra",
+"Nashik, Maharashtra",
+"Navi Mumbai, Maharashtra",
+"Noida, Uttar Pradesh",
+"Patna, Bihar",
+"Prayagraj, Uttar Pradesh",
+"Pune, Maharashtra",
+"Raipur, Chhattisgarh",
+"Rajkot, Gujarat",
+"Ranchi, Jharkhand",
+"Salem, Tamil Nadu",
+"Surat, Gujarat",
+"Thane, Maharashtra",
+"Thiruvananthapuram, Kerala",
+"Tiruchirappalli, Tamil Nadu",
+"Udaipur, Rajasthan",
+"Vadodara, Gujarat",
+"Varanasi, Uttar Pradesh",
+"Vijayawada, Andhra Pradesh",
+"Visakhapatnam, Andhra Pradesh",
+"Warangal, Telangana"
+
+];
+
+
+/* =========================================================
+   DEFAULT DATA
+========================================================= */
+
+let properties = [
+
+{
+    location:"Madhapur",
+    city:"Hyderabad",
+    state:"Telangana",
+    area:1500,
+    bedrooms:3,
+    price:9000000
+},
+
+{
+    location:"Gachibowli",
+    city:"Hyderabad",
+    state:"Telangana",
+    area:1800,
+    bedrooms:3,
+    price:11000000
+},
+
+{
+    location:"Banjara Hills",
+    city:"Hyderabad",
+    state:"Telangana",
+    area:2200,
+    bedrooms:4,
+    price:16500000
+},
+
+{
+    location:"Whitefield",
+    city:"Bengaluru",
+    state:"Karnataka",
+    area:1500,
+    bedrooms:3,
+    price:10500000
+},
+
+{
+    location:"Koramangala",
+    city:"Bengaluru",
+    state:"Karnataka",
+    area:1700,
+    bedrooms:3,
+    price:14500000
+},
+
+{
+    location:"Andheri",
+    city:"Mumbai",
+    state:"Maharashtra",
+    area:900,
+    bedrooms:2,
+    price:15500000
+},
+
+{
+    location:"Powai",
+    city:"Mumbai",
+    state:"Maharashtra",
+    area:1200,
+    bedrooms:2,
+    price:18000000
+},
+
+{
+    location:"Baner",
+    city:"Pune",
+    state:"Maharashtra",
+    area:1400,
+    bedrooms:3,
+    price:9500000
+},
+
+{
+    location:"Whitefield",
+    city:"Bengaluru",
+    state:"Karnataka",
+    area:1200,
+    bedrooms:2,
+    price:7500000
+},
+
+{
+    location:"Gomti Nagar",
+    city:"Lucknow",
+    state:"Uttar Pradesh",
+    area:1600,
+    bedrooms:3,
+    price:6500000
+}
+
+];
+
+
+let predictions = [];
+
+let marketIndex = 100;
+
+let model = null;
+
+
+/* =========================================================
+   ENTER
+========================================================= */
+
+function enterWebsite(){
+
+    document
+        .getElementById("intro")
+        .classList.add("hide");
+
+
+    setTimeout(()=>{
+
+        document
+            .getElementById("app")
+            .classList.add("visible");
+
+    },500);
+
+}
+
+
+/* =========================================================
+   STARS
+========================================================= */
+
+function createStars(){
+
+    const stars =
+        document.getElementById("stars");
+
+
+    for(
+        let i=0;
+        i<100;
+        i++
+    ){
+
+        const star =
+            document.createElement("div");
+
+
+        star.className =
+            "star";
+
+
+        star.style.left =
+            Math.random()*100+"%";
+
+
+        star.style.animationDuration =
+            (7+Math.random()*15)+"s";
+
+
+        star.style.animationDelay =
+            (-Math.random()*15)+"s";
+
+
+        star.style.opacity =
+            Math.random()*.6;
+
+
+        stars.appendChild(star);
+
+    }
+
+}
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+function save(){
+
+    localStorage.setItem(
+        "harsha_properties",
+        JSON.stringify(properties)
+    );
+
+
+    localStorage.setItem(
+        "harsha_predictions",
+        JSON.stringify(predictions)
+    );
+
+
+    localStorage.setItem(
+        "harsha_market_index",
+        marketIndex
+    );
+
+}
+
+
+function load(){
+
+    const p =
+        localStorage.getItem(
+            "harsha_properties"
+        );
+
+
+    const h =
+        localStorage.getItem(
+            "harsha_predictions"
+        );
+
+
+    const m =
+        localStorage.getItem(
+            "harsha_market_index"
+        );
+
+
+    if(p)
+        properties =
+            JSON.parse(p);
+
+
+    if(h)
+        predictions =
+            JSON.parse(h);
+
+
+    if(m)
+        marketIndex =
+            Number(m);
+
+}
+
+
+/* =========================================================
+   STATES
+========================================================= */
+
+function loadStates(){
+
+    const select =
+        document.getElementById("state");
+
+
+    select.innerHTML =
+        '<option value="">Select State / UT</option>';
+
+
+    INDIA_STATES.forEach(
+        state=>{
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                state;
+
+            option.textContent =
+                state;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   LOCATION LIST
+========================================================= */
+
+function loadLocations(){
+
+    const list =
+        document.getElementById(
+            "indiaLocations"
+        );
+
+
+    INDIA_LOCATIONS.forEach(
+        location=>{
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                location;
+
+
+            list.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   LOCATION HASH
+========================================================= */
+
+function locationFactor(
+    location,
+    city,
+    state
+){
+
+    const text =
+        (
+            location+
+            city+
+            state
+        )
+        .toLowerCase();
+
+
+    let hash=0;
+
+
+    for(
+        let i=0;
+        i<text.length;
+        i++
+    ){
+
+        hash =
+            (
+                hash*31
+                +
+                text.charCodeAt(i)
+            )
+            %
+            100000;
+
+    }
+
+
+    return (
+        0.85+
+        (hash%40)/100
+    );
+
+}
+
+
+/* =========================================================
+   FEATURE VECTOR
+========================================================= */
+
+function features(p){
+
+    return [
+
+        Number(p.area)/5000,
+
+        Number(p.bedrooms)/10,
+
+        locationFactor(
+            p.location || "",
+            p.city || "",
+            p.state || ""
+        )/1.3
+
+    ];
+
+}
+
+
+/* =========================================================
+   TRAIN MODEL
+========================================================= */
+
+async function trainModel(){
+
+    if(properties.length < 5){
+
+        showToast(
+            "At least 5 properties are required."
+        );
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "modelStatus"
+    ).innerHTML =
+        '<span class="loading"></span> Training';
+
+
+    const xs =
+        tf.tensor2d(
+            properties.map(
+                features
+            )
+        );
+
+
+    const ys =
+        tf.tensor2d(
+            properties.map(
+                p =>
+                    [
+                        Number(p.price)
+                        /
+                        10000000
+                    ]
+            )
+        );
+
+
+    if(model)
+        model.dispose();
+
+
+    model =
+        tf.sequential();
+
+
+    model.add(
+        tf.layers.dense({
+
+            units:32,
+
+            activation:"relu",
+
+            inputShape:[3]
+
+        })
+    );
+
+
+    model.add(
+        tf.layers.dense({
+
+            units:16,
+
+            activation:"relu"
+
+        })
+    );
+
+
+    model.add(
+        tf.layers.dense({
+
+            units:8,
+
+            activation:"relu"
+
+        })
+    );
+
+
+    model.add(
+        tf.layers.dense({
+
+            units:1
+
+        })
+    );
+
+
+    model.compile({
+
+        optimizer:
+            tf.train.adam(.01),
+
+        loss:
+            "meanSquaredError"
+
+    });
+
+
+    await model.fit(
+        xs,
+        ys,
+        {
+
+            epochs:150,
+
+            batchSize:8,
+
+            shuffle:true,
+
+            verbose:0
+
+        }
+    );
+
+
+    xs.dispose();
+
+    ys.dispose();
+
+
+    document.getElementById(
+        "modelStatus"
+    ).innerText =
+        "Ready";
+
+
+    document.getElementById(
+        "modelStatus"
+    ).className =
+        "ready";
+
+
+    localStorage.setItem(
+        "harsha_last_training",
+        new Date().toLocaleString()
+    );
+
+
+    showToast(
+        "Harsha AI model trained successfully."
+    );
+
+}
+
+
+/* =========================================================
+   PREDICT
+========================================================= */
+
+async function predictPrice(){
+
+    if(!model){
+
+        await trainModel();
+
+    }
+
+
+    const p={
+
+        location:
+            document.getElementById(
+                "areaName"
+            ).value
+            ||
+            "India",
+
+        city:
+            document.getElementById(
+                "city"
+            ).value,
+
+        state:
+            document.getElementById(
+                "state"
+            ).value,
+
+        area:
+            Number(
+                document.getElementById(
+                    "area"
+                ).value
+            ),
+
+        bedrooms:
+            Number(
+                document.getElementById(
+                    "bedrooms"
+                ).value
+            )
+
+    };
+
+
+    if(
+        !p.area ||
+        !p.city ||
+        !p.state
+    ){
+
+        showToast(
+            "Enter area, city and state."
+        );
+
+        return;
+
+    }
+
+
+    const input =
+        tf.tensor2d([
+            features(p)
+        ]);
+
+
+    const output =
+        model.predict(input);
+
+
+    const value =
+        await output.data();
+
+
+    input.dispose();
+
+    output.dispose();
+
+
+    let price =
+        value[0]
+        *
+        10000000;
+
+
+    price *=
+        marketIndex/100;
+
+
+    const low =
+        price*.90;
+
+
+    const high =
+        price*1.10;
+
+
+    document.getElementById(
+        "prediction"
+    ).innerText =
+        currency(price);
+
+
+    document.getElementById(
+        "predictionRange"
+    ).innerText =
+        "Estimated range: "
+        +
+        currency(low)
+        +
+        " – "
+        +
+        currency(high);
+
+
+    predictions.unshift({
+
+        date:
+            new Date().toLocaleString(),
+
+        location:
+            p.location,
+
+        city:
+            p.city,
+
+        area:
+            p.area,
+
+        price:
+            price
+
+    });
+
+
+    predictions =
+        predictions.slice(
+            0,
+            50
+        );
+
+
+    save();
+
+    renderHistory();
+
+
+    showToast(
+        "Harsha AI prediction completed."
+    );
+
+}
+
+
+/* =========================================================
+   DAILY MARKET UPDATE
+========================================================= */
+
+async function updateMarket(){
+
+    /*
+       REAL API MODE
+
+       The browser calls your backend.
+       Your backend should retrieve real market
+       information from your licensed data source.
+
+       Expected response:
+
+       {
+           marketIndex: 103.2,
+           updatedAt: "...",
+           locations: {
+               ...
+           }
+       }
+    */
+
+
+    if(!MARKET_API_URL){
+
+        showToast(
+            "Daily API is not connected yet. Add your real market-data API URL."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                MARKET_API_URL,
+                {
+                    method:
+                        "GET",
+
+                    headers:{
+                        "Accept":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "Market API error"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if(
+            data.marketIndex !== undefined
+        ){
+
+            marketIndex =
+                Number(
+                    data.marketIndex
+                );
+
+        }
+
+
+        localStorage.setItem(
+            "harsha_last_market_update",
+            new Date().toLocaleString()
+        );
+
+
+        save();
+
+        renderDashboard();
+
+
+        showToast(
+            "Live market data updated."
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+
+        showToast(
+            "Unable to retrieve live market data."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   AUTOMATIC DAILY UPDATE
+========================================================= */
+
+async function automaticDailyUpdate(){
+
+    const last =
+        localStorage.getItem(
+            "harsha_update_timestamp"
+        );
+
+
+    const now =
+        Date.now();
+
+
+    const DAY =
+        24*60*60*1000;
+
+
+    if(
+        !last
+        ||
+        now-Number(last)>=DAY
+    ){
+
+        if(MARKET_API_URL){
+
+            await updateMarket();
+
+        }
+
+
+        localStorage.setItem(
+            "harsha_update_timestamp",
+            now
+        );
+
+    }
+
+
+    updateNextUpdate();
+
+}
+
+
+/* =========================================================
+   ADD PROPERTY
+========================================================= */
+
+function addProperty(){
+
+    const p={
+
+        location:
+            document.getElementById(
+                "newLocation"
+            ).value,
+
+        city:
+            document.getElementById(
+                "newCity"
+            ).value,
+
+        state:
+            document.getElementById(
+                "newState"
+            ).value,
+
+        price:
+            Number(
+                document.getElementById(
+                    "newPrice"
+                ).value
+            ),
+
+        area:
+            Number(
+                document.getElementById(
+                    "newArea"
+                ).value
+            ),
+
+        bedrooms:
+            Number(
+                document.getElementById(
+                    "newBedrooms"
+                ).value
+            )
+
+    };
+
+
+    if(
+        !p.location ||
+        !p.city ||
+        !p.state ||
+        !p.price ||
+        !p.area
+    ){
+
+        showToast(
+            "Complete the property information."
+        );
+
+        return;
+
+    }
+
+
+    properties.push(p);
+
+
+    save();
+
+    renderDashboard();
+
+
+    showToast(
+        "Property added successfully."
+    );
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function renderDashboard(){
+
+    document.getElementById(
+        "propertyCount"
+    ).innerText =
+        properties.length;
+
+
+    if(!properties.length)
+        return;
+
+
+    const average =
+        properties.reduce(
+            (sum,p)=>
+                sum+
+                Number(p.price),
+            0
+        )
+        /
+        properties.length;
+
+
+    const averagePSF =
+        properties.reduce(
+            (sum,p)=>
+                sum+
+                (
+                    Number(p.price)
+                    /
+                    Number(p.area)
+                ),
+            0
+        )
+        /
+        properties.length;
+
+
+    document.getElementById(
+        "averagePrice"
+    ).innerText =
+        currency(average);
+
+
+    document.getElementById(
+        "averagePSF"
+    ).innerText =
+        currency(averagePSF);
+
+
+    document.getElementById(
+        "marketIndex"
+    ).innerText =
+        marketIndex.toFixed(2);
+
+
+    document.getElementById(
+        "marketAverage"
+    ).innerText =
+        currency(average);
+
+
+    document.getElementById(
+        "marketPSF"
+    ).innerText =
+        currency(averagePSF);
+
+
+    const change =
+        marketIndex-100;
+
+
+    document.getElementById(
+        "marketChange"
+    ).innerText =
+        (
+            change>=0
+            ? "+"
+            : ""
+        )
+        +
+        change.toFixed(2)
+        +
+        "%";
+
+
+    document.getElementById(
+        "lastUpdate"
+    ).innerText =
+        localStorage.getItem(
+            "harsha_last_market_update"
+        )
+        ||
+        "Not updated";
+
+
+    renderProperties();
+
+}
+
+
+/* =========================================================
+   PROPERTY TABLE
+========================================================= */
+
+function renderProperties(){
+
+    const table =
+        document.getElementById(
+            "propertyTable"
+        );
+
+
+    table.innerHTML="";
+
+
+    properties
+        .slice()
+        .reverse()
+        .forEach(
+            p=>{
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                row.innerHTML=`
+
+                    <td>
+                        ${safe(p.location)}
+                    </td>
+
+                    <td>
+                        ${safe(p.city)}
+                    </td>
+
+                    <td>
+                        ${safe(p.state)}
+                    </td>
+
+                    <td>
+                        ${Number(p.area).toLocaleString()}
+                        sq.ft
+                    </td>
+
+                    <td>
+                        ${p.bedrooms || "-"}
+                    </td>
+
+                    <td>
+                        ${currency(p.price)}
+                    </td>
+
+                    <td>
+                        ${currency(
+                            Number(p.price)
+                            /
+                            Number(p.area)
+                        )}
+                    </td>
+
+                `;
+
+
+                table.appendChild(row);
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function renderHistory(){
+
+    const table =
+        document.getElementById(
+            "historyTable"
+        );
+
+
+    table.innerHTML="";
+
+
+    predictions.forEach(
+        p=>{
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML=`
+
+                <td>
+                    ${safe(p.date)}
+                </td>
+
+                <td>
+                    ${safe(p.location)}
+                </td>
+
+                <td>
+                    ${safe(p.city)}
+                </td>
+
+                <td>
+                    ${Number(p.area).toLocaleString()}
+                    sq.ft
+                </td>
+
+                <td>
+                    ${currency(p.price)}
+                </td>
+
+            `;
+
+
+            table.appendChild(row);
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   JSON EXPORT
+========================================================= */
+
+function exportJSON(){
+
+    const data={
+
+        model:
+            "Harsha House Prediction",
+
+        properties:
+            properties,
+
+        predictions:
+            predictions,
+
+        marketIndex:
+            marketIndex,
+
+        exportedAt:
+            new Date().toISOString()
+
+    };
+
+
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const a =
+        document.createElement("a");
+
+
+    a.href=url;
+
+    a.download=
+        "harsha-house-prediction.json";
+
+
+    a.click();
+
+
+    URL.revokeObjectURL(url);
+
+
+    showToast(
+        "JSON database exported."
+    );
+
+}
+
+
+/* =========================================================
+   JSON IMPORT
+========================================================= */
+
+function importJSON(){
+
+    const input =
+        document.createElement("input");
+
+
+    input.type =
+        "file";
+
+
+    input.accept =
+        ".json";
+
+
+    input.onchange =
+        event=>{
+
+            const file =
+                event.target.files[0];
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                e=>{
+
+                    try{
+
+                        const data =
+                            JSON.parse(
+                                e.target.result
+                            );
+
+
+                        if(
+                            Array.isArray(
+                                data.properties
+                            )
+                        ){
+
+                            properties =
+                                data.properties;
+
+                        }
+
+
+                        if(
+                            Array.isArray(
+                                data.predictions
+                            )
+                        ){
+
+                            predictions =
+                                data.predictions;
+
+                        }
+
+
+                        if(
+                            data.marketIndex
+                        ){
+
+                            marketIndex =
+                                Number(
+                                    data.marketIndex
+                                );
+
+                        }
+
+
+                        save();
+
+                        renderDashboard();
+
+                        renderHistory();
+
+
+                        showToast(
+                            "JSON database imported."
+                        );
+
+                    }
+                    catch{
+
+                        showToast(
+                            "Invalid JSON file."
+                        );
+
+                    }
+
+                };
+
+
+            reader.readAsText(file);
+
+        };
+
+
+    input.click();
+
+}
+
+
+/* =========================================================
+   NEXT UPDATE
+========================================================= */
+
+function updateNextUpdate(){
+
+    const last =
+        localStorage.getItem(
+            "harsha_update_timestamp"
+        );
+
+
+    if(!last){
+
+        document.getElementById(
+            "nextUpdate"
+        ).innerText =
+            "First update pending";
+
+        return;
+
+    }
+
+
+    const next =
+        Number(last)
+        +
+        24*60*60*1000;
+
+
+    const remaining =
+        next-Date.now();
+
+
+    if(remaining<=0){
+
+        document.getElementById(
+            "nextUpdate"
+        ).innerText =
+            "Updating...";
+
+        return;
+
+    }
+
+
+    const hours =
+        Math.floor(
+            remaining/
+            3600000
+        );
+
+
+    const minutes =
+        Math.floor(
+            (
+                remaining%3600000
+            )
+            /
+            60000
+        );
+
+
+    document.getElementById(
+        "nextUpdate"
+    ).innerText =
+        hours+
+        "h "+
+        minutes+
+        "m";
+
+}
+
+
+/* =========================================================
+   CURRENCY
+========================================================= */
+
+function currency(value){
+
+    if(
+        !Number.isFinite(
+            Number(value)
+        )
+    ){
+
+        return "₹0";
+
+    }
+
+
+    return "₹"
+        +
+        Math.round(
+            Number(value)
+        )
+        .toLocaleString(
+            "en-IN"
+        );
+
+}
+
+
+/* =========================================================
+   SAFE TEXT
+========================================================= */
+
+function safe(value){
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* =========================================================
+   CLEAR
+========================================================= */
+
+function clearPrediction(){
+
+    document.getElementById(
+        "prediction"
+    ).innerText =
+        "₹0";
+
+
+    document.getElementById(
+        "predictionRange"
+    ).innerText =
+        "Enter property information to generate a prediction.";
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function goPredict(){
+
+    document
+        .getElementById("predict")
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+
+}
+
+
+function goIndia(){
+
+    document
+        .getElementById("india")
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(message){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.innerText =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    setTimeout(
+        ()=>{
+            toast.classList.remove(
+                "show"
+            );
+        },
+        3500
+    );
+
+}
+
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+createStars();
+
+load();
+
+loadStates();
+
+loadLocations();
+
+renderDashboard();
+
+renderHistory();
+
+updateNextUpdate();
+
+automaticDailyUpdate();
+
+
+setInterval(
+    updateNextUpdate,
+    60000
+);
+
+
+/*
+   Check once every hour.
+
+   If 24 hours have passed, the application
+   requests the latest market information.
+*/
+
+setInterval(
+    automaticDailyUpdate,
+    60*60*1000
+);
+
+
+const lastTraining =
+    localStorage.getItem(
+        "harsha_last_training"
+    );
+
+
+if(lastTraining){
+
+    console.log(
+        "Last AI training:",
+        lastTraining
+    );
+
+}
+
+</script>
+
+</body>
+</html>
+```
